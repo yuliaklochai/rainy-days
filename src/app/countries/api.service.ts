@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, Observable, take, tap, of } from 'rxjs';
-// import { tap } from 'rxjs/operators';
+import { map, Observable, of } from 'rxjs';
 
-export interface Country {
+interface Country {
   country: string;
   code: string;
   iso3: string;
@@ -55,12 +54,12 @@ export interface CountryTop {
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  countryUrl = 'https://countriesnow.space/api/v0.1/countries';
-  weatherUrl = 'https://archive-api.open-meteo.com/v1/era5';
+  private countryUrl = 'https://countriesnow.space/api/v0.1/countries';
+  private weatherUrl = 'https://archive-api.open-meteo.com/v1/era5';
 
   constructor(private http: HttpClient) {}
 
-  getCountries(): Observable<Country[]> {
+  public getCountries(): Observable<Country[]> {
     return this.http.get<CountryObj>(`${this.countryUrl}/population`).pipe(
       map((obj) => obj.data),
       map((arr) => {
@@ -74,21 +73,15 @@ export class ApiService {
     );
   }
 
-  getCountryLocation(countryName: string): Observable<CountryLocationRes> {
+  public getCountryLocation(countryName: string): Observable<CountryLocationRes> {
     return this.http.post<CountryLocationRes>(`${this.countryUrl}/positions`, {
       country: countryName,
     });
   }
 
-  getWeatherByLocation(lat: number, long: number): Observable<RainData> {
+  public getWeatherByLocation(lat: number, long: number): Observable<RainData> {
     return this.http.get<RainData>(
       `${this.weatherUrl}?latitude=${lat}&longitude=${long}&start_date=2022-03-01&end_date=2022-05-31&hourly=rain`
     );
-  }
-
-  private handleError<T>(result?: T) {
-    return (error: Error): Observable<T> => {
-      return of(result as T);
-    };
   }
 }

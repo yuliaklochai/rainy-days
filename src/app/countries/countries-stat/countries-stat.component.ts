@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   ApiService,
-  Country,
   CountryLocation,
   CountryTop,
   HourlyRainData,
@@ -22,9 +21,10 @@ import { MatTableDataSource } from '@angular/material/table';
   templateUrl: './countries-stat.component.html',
   styleUrls: ['./countries-stat.component.css'],
 })
-export class CountriesStatComponent implements OnInit {
-  subscriptions: Subscription[] = [];
+export class CountriesStatComponent implements OnInit, OnDestroy {
+  subscription!: Subscription;
   displayedColumns: string[] = [
+    'position',
     'name',
     'population',
     'rainyWeekend',
@@ -40,7 +40,8 @@ export class CountriesStatComponent implements OnInit {
   }
 
   getCountries() {
-    this.apiService
+    
+    this.subscription = this.apiService
       .getCountries()
       .pipe(
         switchMap((el) => el),
@@ -126,5 +127,9 @@ export class CountriesStatComponent implements OnInit {
       }
     }
     return rainydays;
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 }
