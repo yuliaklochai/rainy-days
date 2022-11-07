@@ -40,11 +40,10 @@ export class CountriesStatComponent implements OnInit, OnDestroy {
   }
 
   getCountries() {
-    
     this.subscription = this.apiService
       .getCountries()
       .pipe(
-        switchMap((el) => el),
+        switchMap((res) => res),
         mergeMap((el) =>
           this.apiService.getCountryLocation(el.country).pipe(
             map((res) => {
@@ -60,9 +59,9 @@ export class CountriesStatComponent implements OnInit, OnDestroy {
           )
         ),
         toArray(),
-        map((arr) => arr.sort((a, b) => b.population - a.population)),
-        map((arr) => arr.slice(0, 20)),
-        switchMap((el) => el),
+        map((res) => res.sort((a, b) => b.population - a.population)),
+        map((res) => res.slice(0, 20)),
+        switchMap((res) => res),
         mergeMap((el) =>
           this.apiService.getWeatherByLocation(el.lat, el.long).pipe(
             map((res) => {
@@ -113,23 +112,23 @@ export class CountriesStatComponent implements OnInit, OnDestroy {
   }
 
   private getRainyDays(data: HourlyRainData) {
-    let rainyidx = data.rain
+    let rainyIdx = data.rain
       .map((el, i) => (el > 0 ? i : undefined))
       .filter((el) => el as Number);
-    let rainydays: string[] = [];
-    for (let idx of rainyidx) {
+    let rainyDays: string[] = [];
+    for (let idx of rainyIdx) {
       if (idx) {
         let day = data.time[idx];
         let dayArr = day.split('T');
-        if (!rainydays.includes(dayArr[0])) {
-          rainydays.push(dayArr[0]);
+        if (!rainyDays.includes(dayArr[0])) {
+          rainyDays.push(dayArr[0]);
         }
       }
     }
-    return rainydays;
+    return rainyDays;
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe()
+    this.subscription.unsubscribe();
   }
 }
